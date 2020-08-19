@@ -1,11 +1,14 @@
 const Alexa = require('ask-sdk-core')
 const axios = require('axios')
+require('dotenv').config()
 
 
 function getDirector (title){
     const apikey = process.env.OMDB_API_KEY
 
-    return axios.get()
+    return axios.get('http://www.omdbapi.com/?apikey=${apikey}&t=${title}').then((response) => {
+        return response.data.Director
+    })
 }
 const DirectorIntentHandler = {
     canHandle(handlerInput) {
@@ -31,11 +34,14 @@ const DirectorIntentHandler = {
       handle(handlerInput) {
           return handlerInput.responseBuilder
           .speak("My bad, didn't catch that. Can you repeat it ?")
-          .reprompt("My bad, didn't catch that")
+          .reprompt("My bad, didn't catch that. Can you repeat it ?")
+          .withShouldEndSession(false)
+          .getResponse()
       }
   }
 
   const builder = Alexa.SkillBuilders.custom()
+  
   exports.handler = builder
     .addRequestHandlers(DirectorIntentHandler)
     .addErrorHandlers(ErrorHandler)
